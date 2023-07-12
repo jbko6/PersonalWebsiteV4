@@ -1,13 +1,15 @@
 {
   "dependencies": {
+    "@types/three": "^0.153.0",
     "three": "^0.154.0"
   },
   "devDependencies": {
+    "typescript": "^5.1.6",
     "vite": "^4.4.3"
   },
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "dev": "cd src & vite",
+    "build": "cd src & vite build",
+    "preview": "cd src & vite preview"
   }
 }
