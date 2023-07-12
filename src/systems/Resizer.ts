@@ -5,20 +5,23 @@ const setSize = (container : HTMLElement, camera : PerspectiveCamera, renderer :
     camera.updateProjectionMatrix();
 
     renderer.setSize(container.clientWidth, container.clientHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
 };
 
 class Resizer {
+    updatables : any[];
+
     constructor(container : HTMLElement, camera : PerspectiveCamera, renderer : WebGLRenderer) {
+        this.updatables = [];
+
         setSize(container, camera, renderer);
 
         window.addEventListener("resize", () => {
             setSize(container, camera, renderer);
-            this.onResize();
+            for (const object of this.updatables) {
+                object.onResize();
+            }
         })
     }
-
-    onResize() {}
 }
 
 export { Resizer };
