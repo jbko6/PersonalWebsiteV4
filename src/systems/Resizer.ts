@@ -1,4 +1,5 @@
 import { type WebGLRenderer, type PerspectiveCamera } from "three";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
 
 const setSize = (container : HTMLElement, camera : PerspectiveCamera, renderer : WebGLRenderer) => {
     camera.aspect = container.clientWidth / container.clientHeight;
@@ -9,9 +10,11 @@ const setSize = (container : HTMLElement, camera : PerspectiveCamera, renderer :
 
 class Resizer {
     updatables : any[];
+    effectComposer : EffectComposer;
 
-    constructor(container : HTMLElement, camera : PerspectiveCamera, renderer : WebGLRenderer) {
+    constructor(container : HTMLElement, camera : PerspectiveCamera, renderer : WebGLRenderer, effectComposer? : EffectComposer) {
         this.updatables = [];
+        this.effectComposer = effectComposer!;
 
         setSize(container, camera, renderer);
 
@@ -20,7 +23,11 @@ class Resizer {
             for (const object of this.updatables) {
                 object.onResize();
             }
-        })
+
+            if (this.effectComposer) {
+                this.effectComposer.reset();
+            }
+        });
     }
 }
 

@@ -1,10 +1,22 @@
-import { BoxGeometry, Mesh, MeshStandardMaterial } from 'three';
-import { UpdatingObject } from '../util/util';
+import { BoxGeometry, type Material, Mesh, MeshStandardMaterial, TextureLoader } from 'three';
+import { UpdatingObject } from '../util/types';
+
+function createMaterial() : Material {
+    const textureLoader = new TextureLoader();
+    
+    const texture = textureLoader.load('/assets/textures/uv-test-bw.jpg');
+
+    const material = new MeshStandardMaterial({
+        map: texture
+    });
+
+    return material;
+}
 
 function createCube() : UpdatingObject & Mesh {
     const geometry = new BoxGeometry(2, 2, 2);
 
-    const material = new MeshStandardMaterial({color:'purple'});
+    const material = createMaterial();
 
     const cube : UpdatingObject & Mesh = new Mesh(geometry, material);
 

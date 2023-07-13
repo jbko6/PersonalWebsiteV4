@@ -1,16 +1,22 @@
-import { type PerspectiveCamera, type Scene, type WebGLRenderer } from 'three';
+import { type Light, type PerspectiveCamera, type Scene, type WebGLRenderer } from 'three';
+import { degToRad } from 'three/src/math/MathUtils.js';
+import { type EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+
 import { createCamera } from '../components/camera.js';
 import { createCube } from '../components/cube.js';
 import { createLights } from '../components/lights.js';
 import { createScene } from '../components/scene.js';
 
 import { createRenderer } from '../systems/renderer.js';
+import { createEffectComposer } from '../systems/postprocessing.js';
 import { Resizer } from '../systems/Resizer.js';
 import { Loop } from '../systems/Loop.js';
+
 
 let camera : PerspectiveCamera;
 let scene : Scene;
 let renderer : WebGLRenderer;
+let effectComposer : EffectComposer
 let loop : Loop;
 
 class World {
@@ -19,20 +25,27 @@ class World {
         camera = createCamera();
         scene = createScene();
         renderer = createRenderer();
-        loop = new Loop(camera, scene, renderer);
-        container.append(renderer.domElement);
-
-        const cube = createCube();
-        const light = createLights();
-
-        loop.updatables.push(cube);
-
-        scene.add(light);
-        
-        scene.add(cube);
 
         const resizer = new Resizer(container, camera, renderer);
         resizer.updatables.push(camera);
+
+        effectComposer = createEffectComposer(renderer, scene, camera);
+        resizer.effectComposer = effectComposer;
+
+        loop = new Loop(camera, scene, renderer, effectComposer);
+        container.append(renderer.domElement);
+
+        const cube = createCube();
+        const lights : Light[] = createLights();
+
+        loop.updatables.push(cube);
+
+        for (const light of lights) {
+            scene.add(light);
+        }
+        
+        scene.add(cube);
+        scene.add(cube.clone().translateX(2).rotateY(degToRad(45)))
     }
 
     render() {

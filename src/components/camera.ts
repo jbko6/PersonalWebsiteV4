@@ -1,5 +1,5 @@
 import {PerspectiveCamera} from 'three';
-import { UpdatingObject } from '../util/util';
+import { UpdatingObject } from '../util/types';
 
 function createCamera() : UpdatingObject & PerspectiveCamera {
     const camera : UpdatingObject & PerspectiveCamera = new PerspectiveCamera(

@@ -3,4 +3,4 @@ interface UpdatingObject {
     onResize? : {(): void}
 }
 
-export { UpdatingObject};
+export { UpdatingObject };
