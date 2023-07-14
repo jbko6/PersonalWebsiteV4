@@ -1,4 +1,4 @@
-import { BoxGeometry, type Material, Mesh, MeshStandardMaterial, TextureLoader } from 'three';
+import { BoxGeometry, type Material, Mesh, TextureLoader, MeshToonMaterial } from 'three';
 import { UpdatingObject } from '../util/types';
 
 function createMaterial() : Material {
@@ -6,7 +6,7 @@ function createMaterial() : Material {
     
     const texture = textureLoader.load('/assets/textures/uv-test-bw.jpg');
 
-    const material = new MeshStandardMaterial({
+    const material = new MeshToonMaterial({
         map: texture
     });
 

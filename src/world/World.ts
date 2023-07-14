@@ -11,6 +11,7 @@ import { createRenderer } from '../systems/renderer.js';
 import { createEffectComposer } from '../systems/postprocessing.js';
 import { Resizer } from '../systems/Resizer.js';
 import { Loop } from '../systems/Loop.js';
+import { createSphere } from '../components/sphere.js';
 
 
 let camera : PerspectiveCamera;
@@ -36,6 +37,7 @@ class World {
         container.append(renderer.domElement);
 
         const cube = createCube();
+        const sphere = createSphere().translateX(5);
         const lights : Light[] = createLights();
 
         loop.updatables.push(cube);
@@ -46,6 +48,9 @@ class World {
         
         scene.add(cube);
         scene.add(cube.clone().translateX(2).rotateY(degToRad(45)))
+        scene.add(sphere);
+        scene.add(sphere.clone().translateX(-10).translateY(2));
+        scene.add(sphere.clone().translateX(-3).translateY(-5));
     }
 
     render() {
