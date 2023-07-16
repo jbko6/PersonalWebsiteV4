@@ -1,3 +1,5 @@
+import { Vector2 } from "three";
+
 const WatercolorShader = {
     name: "WatercolorShader",
 
@@ -9,21 +11,24 @@ const WatercolorShader = {
         'wobbleIntensity' : {value: 0.1},
         'paperGrain' : {value:1.0},
         'noiseGrain' : {value: 1.5},
-        'backgroundOpacity' : {value: 1.0}
+        'backgroundOpacity' : {value: 1.0},
+        'paperOffset': {value:new Vector2(0,0)}
     },
 
     vertexShader: `
         varying vec2 vUv;
+        varying vec3 vPosition;
 
         void main() {
             vUv = uv;
+            vPosition = (vec4(position, 1.0) * modelViewMatrix).xyz;
             
             gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
         }
     `,
 
     fragmentShader: `
-            #define PI 3.1415926538
+        #define PI 3.1415926538
 
         uniform sampler2D screen;
         uniform sampler2D paperTexture;
@@ -33,8 +38,10 @@ const WatercolorShader = {
         uniform float noiseGrain;
         uniform float wobbleIntensity;
         uniform float backgroundOpacity;
+        uniform vec2 paperOffset;
 
         varying vec2 vUv;
+        varying vec3 vPosition;
 
         mat3 G[9] = mat3[](
             1.0/(2.0*sqrt(2.0)) * mat3( 1.0, sqrt(2.0), 1.0, 0.0, 0.0, 0.0, -1.0, -sqrt(2.0), -1.0 ),
@@ -114,10 +121,12 @@ const WatercolorShader = {
             vec2 screenSize = vec2(textureSize(screen, 0));
             float screenRatio = screenSize.x / screenSize.y;
 
+            vec2 offsetvUv = vUv + paperOffset;
+
             // load watercolor normal
             float nPaperRatio = float(textureSize(normalPaperTexture, 0).y) / float(textureSize(normalPaperTexture, 0).x);
-            vec3 N = normalize(texture2D(normalPaperTexture, vec2(vUv.x * screenRatio, vUv.y) * wobbleGrain).xyz * 2.0 - 1.0) * wobbleIntensity;
-            ivec2 pixel = ivec2(gl_FragCoord.x + (N.x*255.0), gl_FragCoord.y + (N.y*255.0));
+            vec3 N = normalize(texture2D(normalPaperTexture, vec2(offsetvUv.x * screenRatio, offsetvUv.y) * wobbleGrain).xyz * 2.0 - 1.0) * wobbleIntensity;
+            ivec2 pixel = ivec2((screenSize.x * offsetvUv.x) + (N.x*255.0), (screenSize.y * offsetvUv.y) + (N.y*255.0));
 
             float edgeValue = getEdgeValue(vec2(pixel), screenSize);
             float invertedEdgeValue = 1.0 - edgeValue;
@@ -125,16 +134,15 @@ const WatercolorShader = {
             
             vec4 screenColor = texture2D(screen, vec2(float(pixel.x) / screenSize.x, float(pixel.y) / screenSize.y));
 
-            float noise = min(max(rand(vec2(vUv)), 0.2), 0.5);
-            float noise2 = min(max(rand(vec2(vUv)), 0.2), 0.5);
+            float noise = min(max(rand(vec2(offsetvUv)), 0.2), 0.5);
+            float noise2 = min(max(rand(vec2(offsetvUv)), 0.2), 0.5);
             vec4 noisyScreenColor = screenColor + vec4(vec3((((noise + noise2) / 2.0) /20.0) * 2.0 - 0.05), screenColor.a);
 
-            float perlinNoise = min(max(smoothNoise(vUv*noiseGrain), 0.0), 1.0);
-            float filteredPerlinNoise = max(perlinNoise - abs(smoothNoise(vUv*(noiseGrain/4.0))), 0.0) / 5.0;
+            float perlinNoise = min(max(smoothNoise((vUv-paperOffset/5.0)*noiseGrain), 0.0), 1.0);
+            float filteredPerlinNoise = max(perlinNoise - abs(smoothNoise((vUv-paperOffset/5.0)*(noiseGrain/4.0))), 0.0) / 5.0;
             vec4 perlinNoisyScreenColor = noisyScreenColor + vec4(vec3(filteredPerlinNoise), screenColor.a);
-
             // load paper texture
-            vec3 paperTexel = texture2D(paperTexture, vec2(vUv.x * screenRatio, vUv.y) * paperGrain).rgb;
+            vec3 paperTexel = texture2D(paperTexture, vec2(offsetvUv.x * screenRatio, offsetvUv.y) * paperGrain).rgb;
             vec4 paperScreenColor = perlinNoisyScreenColor * vec4(grayscale(paperTexel), screenColor.a);
 
             vec4 finalScreenColor = screenColor.a >= 0.5 ? paperScreenColor : screenColor;

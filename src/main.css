@@ -10,3 +10,7 @@ body {
 
     background-color: skyblue;
 }
+
+#scene-container > canvas {
+    perspective: 40px;
+}

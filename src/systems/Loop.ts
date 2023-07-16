@@ -1,6 +1,7 @@
 import { Clock, type Scene, type PerspectiveCamera, type WebGLRenderer } from 'three';
 import { type EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
 import Stats from 'stats.js';
+import { UpdatingObject } from '../util/types';
 
 const clock = new Clock();
 
@@ -12,10 +13,10 @@ class Loop {
     camera : PerspectiveCamera;
     scene : Scene;
     renderer : WebGLRenderer;
-    effectComposer : EffectComposer;
+    effectComposer : EffectComposer & UpdatingObject;
     updatables : any[];
 
-    constructor(camera : PerspectiveCamera, scene : Scene, renderer : WebGLRenderer, effectComposer? : EffectComposer) {
+    constructor(camera : PerspectiveCamera, scene : Scene, renderer : WebGLRenderer, effectComposer? : EffectComposer & UpdatingObject) {
         this.camera = camera;
         this.scene = scene;
         this.renderer = renderer;
@@ -32,6 +33,9 @@ class Loop {
             this.tick(delta);
 
             if (this.effectComposer) {
+                if(this.effectComposer.tick) {
+                    this.effectComposer.tick(delta);
+                }
                 this.effectComposer.render(delta);
             } else {
                 this.renderer.render(this.scene, this.camera);

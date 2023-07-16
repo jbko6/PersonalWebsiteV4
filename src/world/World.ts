@@ -23,7 +23,7 @@ let loop : Loop;
 class World {
 
     constructor(container : HTMLElement) {
-        camera = createCamera();
+        camera = createCamera(container);
         scene = createScene();
         renderer = createRenderer();
 
@@ -41,6 +41,7 @@ class World {
         const lights : Light[] = createLights();
 
         loop.updatables.push(cube);
+        loop.updatables.push(sphere);
 
         for (const light of lights) {
             scene.add(light);
