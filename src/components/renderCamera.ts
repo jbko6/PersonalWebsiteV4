@@ -4,7 +4,7 @@ import { degToRad } from 'three/src/math/MathUtils';
 
 const SENSITIVITY = 0.005;
 
-function createCamera(container : HTMLElement) : UpdatingObject & PerspectiveCamera {
+function createRenderCamera(container : HTMLElement) : UpdatingObject & PerspectiveCamera {
     const camera : UpdatingObject & PerspectiveCamera = new PerspectiveCamera(
         70, // fov
         1, // aspect ratio (dummy value)
@@ -20,12 +20,14 @@ function createCamera(container : HTMLElement) : UpdatingObject & PerspectiveCam
     });
 
     camera.onResize = () => {
-        camera.position.set(0, 0, window.innerWidth / 150);
+        camera.updateProjectionMatrix();
     }
 
     camera.onResize();
 
+    camera.position.set(0, 0, 500);
+
     return camera;
 }
 
-export { createCamera }
+export { createRenderCamera }
