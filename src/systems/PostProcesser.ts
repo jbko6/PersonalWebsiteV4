@@ -4,7 +4,6 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass";
 import { SMAAPass } from "three/examples/jsm/postprocessing/SMAAPass";
 import { CopyShader } from "three/examples/jsm/shaders/CopyShader";
-import { BlendShader } from "three/examples/jsm/shaders/BlendShader";
 import { BrightnessContrastShader } from "three/examples/jsm/shaders/BrightnessContrastShader";
 
 import { WatercolorTextureShader } from "../shaders/WatercolorTextureShader";
@@ -14,7 +13,7 @@ import { UpdatingObject } from "../util/types";
 import { OutlinePass } from "three/examples/jsm/postprocessing/OutlinePass";
 import { WatercolorEdgeShader } from "../shaders/WatercolorEdgeShader";
 import { WatercolorEdgeBlurShader } from "../shaders/WatercolorEdgeBlurShader";
-import { MaskShader } from "../shaders/MaskShader";
+import { BlendShader } from "../shaders/BlendShader";
 
 class PostProcesser {
 
@@ -47,10 +46,6 @@ class PostProcesser {
         const edgeBlurPass = new ShaderPass(WatercolorEdgeBlurShader, "screen");
         this.edgeComposer.addPass(edgeBlurPass);
 
-        const maskPass = new ShaderPass(MaskShader, "screen");
-        maskPass.uniforms.mask.value = this.renderComposer.readBuffer.texture;
-        this.edgeComposer.addPass(maskPass);
-
         const edgeCopyShader = new ShaderPass(CopyShader);
         this.edgeComposer.addPass(edgeCopyShader);
 
@@ -59,8 +54,8 @@ class PostProcesser {
         this.mainComposer = new EffectComposer(renderer);
 
         const blendPass = new ShaderPass(BlendShader);
-        blendPass.uniforms.tDiffuse1.value = this.renderComposer.readBuffer.texture;
-        blendPass.uniforms.tDiffuse2.value = this.edgeComposer.readBuffer.texture;
+        blendPass.uniforms.render.value = this.renderComposer.readBuffer.texture;
+        blendPass.uniforms.edge.value = this.edgeComposer.readBuffer.texture;
         blendPass.uniforms.mixRatio.value = 0.5;
         this.mainComposer.addPass(blendPass);
 
