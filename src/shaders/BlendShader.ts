@@ -32,7 +32,7 @@ const BlendShader = {
 
 			vec4 renderTexel = texture2D( render, vUv );
 			vec4 edgeTexel = texture2D( edge, vUv );
-			gl_FragColor = vec4((renderTexel + edgeTexel).rgb, renderTexel.a);
+			gl_FragColor = vec4((renderTexel - edgeTexel).rgb, renderTexel.a);
 
 		}`
 

@@ -78,7 +78,7 @@ const WatercolorEdgeShader = {
 
 			float G = sqrt( ( valueGx * valueGx ) + ( valueGy * valueGy ) );
 
-			gl_FragColor = vec4(vec3(G), 1.0);
+			gl_FragColor = vec4(vec3(min(G, 0.2)), 1.0);
 
 		}`
 
